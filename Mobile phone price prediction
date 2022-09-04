@@ -1,1 +1,39 @@
 
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import sklearn.datasets
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+
+price_prediction=pd.read_csv("../input/mobile-price-prediction/Cellphone.csv")
+price_prediction.head()
+price_prediction.shape
+price_prediction.info()
+price_prediction.describe()
+price_prediction.groupby("Price").mean()
+x=price_prediction.drop(["Product_id","Price"],axis=1)
+y=price_prediction["Price"]
+x_train,x_test,y_train,y_test= train_test_split(x,y,test_size=0.2,random_state=2)
+print(x.shape,x_train.shape,x_test.shape)
+model=LogisticRegression()
+model.fit(x_train,y_train)
+x_train_predict=model.predict(x_train)
+training_data_accuracy=accuracy_score(y_train,x_train_predict)
+print("Accuracy of training data",training_data_accuracy)
+x_test_predict=model.predict(x_test)
+testing_data_accuracy= accuracy_score(y_test,x_test_predict)
+print("Accuracy of testing data",testing_data_accuracy)
+input_data=(10,110,4.7,312,4,1.2,8,1.5,13,5,2000,7.6)
+#change the input data into numpy
+input_data_as_numpy=np.asarray(input_data)
+#reshape the numpy array as we are predicting for one datapoint
+input_data_reshaped=input_data_as_numpy.reshape(1,-1)
+
+prediction=model.predict(input_data_reshaped)
+print("Aprrox phone Price",prediction)
+ 
