@@ -1,0 +1,716 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "mount_file_id": "1hwV0-JpIrHU400C6dimcYGwhYH_vUaOG",
+      "authorship_tag": "ABX9TyMtNrgAmjbNCQnah0Y2abGJ",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/bhargav998/playing-with-data-sets/blob/main/Pyspark_tutorials\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wTFGEh_FLX7d",
+        "outputId": "5d5b23f2-59ae-403c-9987-b6f2f849d367"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting pyspark\n",
+            "  Downloading pyspark-3.4.0.tar.gz (310.8 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m310.8/310.8 MB\u001b[0m \u001b[31m3.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: py4j==0.10.9.7 in /usr/local/lib/python3.10/dist-packages (from pyspark) (0.10.9.7)\n",
+            "Building wheels for collected packages: pyspark\n",
+            "  Building wheel for pyspark (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for pyspark: filename=pyspark-3.4.0-py2.py3-none-any.whl size=311317130 sha256=b4fb91cc593560581c39e19d70e788928725cedd9787b440ee4f5b69c480f9cc\n",
+            "  Stored in directory: /root/.cache/pip/wheels/7b/1b/4b/3363a1d04368e7ff0d408e57ff57966fcdf00583774e761327\n",
+            "Successfully built pyspark\n",
+            "Installing collected packages: pyspark\n",
+            "Successfully installed pyspark-3.4.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "pip install pyspark"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Input :\n",
+        "Mail,mob\n",
+        "Renuka1992@gmail.com,9856765434 \n",
+        "anbu.arasu@gmail.com,9844567788 \n",
+        "\n",
+        "Output:\n",
+        "Mail,mob\n",
+        "R********2@gmail.com,98****34 \n",
+        "a********u@gmail.com,98****88"
+      ],
+      "metadata": {
+        "id": "zfqg66QRpIHQ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import udf, lit\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "\n",
+        "# Masking function\n",
+        "def mask_email(email):\n",
+        "  return(email[0]+\"**********\"+email[8:])\n",
+        "\n",
+        "def mask_mobile(mobile):\n",
+        "  return(mobile[0:2]+\"**********\"+mobile[-3:])\n",
+        "\n",
+        "\n",
+        "# Create DataFrame\n",
+        "df = spark.createDataFrame([(\"RIL\",\"\"), (\"anbu.arasu@gmail.com\",\"9844567788\")], [\"email\", \"mobile\"])\n",
+        "\n",
+        "# Mask the email column\n",
+        "masked_df = df.withColumn(\"email\", udf(mask_email)(df.email)).withColumn(\"mobile\", udf(mask_mobile)(df.mobile))\n",
+        "masked_df.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ATp91AlKLaSk",
+        "outputId": "aa8820f8-046b-4b41-a185-e2935f9323e4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------------------+---------------+\n",
+            "|               email|         mobile|\n",
+            "+--------------------+---------------+\n",
+            "|R**********92@gma...|98**********434|\n",
+            "|a**********su@gma...|98**********788|\n",
+            "+--------------------+---------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "EvQ-RbX34IXT"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Replace checking with cash in column"
+      ],
+      "metadata": {
+        "id": "ktPk833J9Bx-"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import udf, lit,col,explode,regexp_replace,when,sum\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.csv('/content/personal_transactions.csv',header='true')\n",
+        "df1=df.withColumn(\"Card_type\",regexp_replace(df.Card_type, \"Checking\", \"cash\"))\n",
+        "df1.show()\n",
+        "df2=df1.withColumn(\"final amt\",when(col(\"Transaction type\")==\"debit\",-1*col(\"amount\")).otherwise(col(\"amount\")))\n",
+        "df2.show()\n",
+        "grouped_df = df2.groupBy(\"Customer_No\").agg(sum(\"final amt\"))\n",
+        "grouped_df.show()\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 389
+        },
+        "id": "ZOulFlVz24dD",
+        "outputId": "54b38765-d33f-41c9-cf69-36ba648de7a4"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "AnalysisException",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mAnalysisException\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-3-76c7a7362fb3>\u001b[0m in \u001b[0;36m<cell line: 5>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0mspark\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mSparkSession\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbuilder\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgetOrCreate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 5\u001b[0;31m \u001b[0mdf\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcsv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/personal_transactions.csv'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mheader\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'true'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      6\u001b[0m \u001b[0mdf1\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwithColumn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Card_type\"\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mregexp_replace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mCard_type\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Checking\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"cash\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m \u001b[0mdf1\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mshow\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/sql/readwriter.py\u001b[0m in \u001b[0;36mcsv\u001b[0;34m(self, path, schema, sep, encoding, quote, escape, comment, header, inferSchema, ignoreLeadingWhiteSpace, ignoreTrailingWhiteSpace, nullValue, nanValue, positiveInf, negativeInf, dateFormat, timestampFormat, maxColumns, maxCharsPerColumn, maxMalformedLogPerPartition, mode, columnNameOfCorruptRecord, multiLine, charToEscapeQuoteEscaping, samplingRatio, enforceSchema, emptyValue, locale, lineSep, pathGlobFilter, recursiveFileLookup, modifiedBefore, modifiedAfter, unescapedQuoteHandling)\u001b[0m\n\u001b[1;32m    725\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpath\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m==\u001b[0m \u001b[0mlist\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    726\u001b[0m             \u001b[0;32massert\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_spark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_sc\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jvm\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 727\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_df\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jreader\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcsv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_spark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_sc\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jvm\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mPythonUtils\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtoSeq\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpath\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    728\u001b[0m         \u001b[0;32melif\u001b[0m \u001b[0misinstance\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpath\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mRDD\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    729\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/py4j/java_gateway.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, *args)\u001b[0m\n\u001b[1;32m   1320\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1321\u001b[0m         \u001b[0manswer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgateway_client\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_command\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcommand\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1322\u001b[0;31m         return_value = get_return_value(\n\u001b[0m\u001b[1;32m   1323\u001b[0m             answer, self.gateway_client, self.target_id, self.name)\n\u001b[1;32m   1324\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/errors/exceptions/captured.py\u001b[0m in \u001b[0;36mdeco\u001b[0;34m(*a, **kw)\u001b[0m\n\u001b[1;32m    173\u001b[0m                 \u001b[0;31m# Hide where the exception came from that shows a non-Pythonic\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    174\u001b[0m                 \u001b[0;31m# JVM exception message.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 175\u001b[0;31m                 \u001b[0;32mraise\u001b[0m \u001b[0mconverted\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    176\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    177\u001b[0m                 \u001b[0;32mraise\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mAnalysisException\u001b[0m: [PATH_NOT_FOUND] Path does not exist: file:/content/personal_transactions.csv."
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import udf, lit,col,explode,regexp_replace,when,sum\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.csv('/content/personal_transactions.csv',header='true')\n",
+        "df1=df.withColumn(\"Card_type\",regexp_replace(df.Card_type, \"Checking\", \"cash\"))\n",
+        "pivoted_df = df1.groupBy(\"Customer_No\").pivot(\"Transaction type\").agg(sum(\"amount\"))\n",
+        "c=pivoted_df.withColumn(\"final amt\",col(\"credit\")-col(\"debit\")).drop(\"credit\",\"debit\")\n",
+        "c.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "w01F6NHmK1ik",
+        "outputId": "30f8b69b-3622-445d-be2a-32a5e2ffd528"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----------+------------------+\n",
+            "|Customer_No|         final amt|\n",
+            "+-----------+------------------+\n",
+            "|    1001863|           2069.64|\n",
+            "|    1001368|2155.7200000000003|\n",
+            "|    1000210|1705.1399999999999|\n",
+            "|    1000531|1657.1499999999996|\n",
+            "|    1000654| 798.1199999999999|\n",
+            "|    1002324|           1601.49|\n",
+            "|    1000501|           2720.32|\n",
+            "+-----------+------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "Dh5p3JUBNmD-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Maximum Amount can be debited on latest date\n"
+      ],
+      "metadata": {
+        "id": "3xA8EwgKNz1k"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import udf, lit,col,explode,regexp_replace,when,sum\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.csv('/content/personal_transactions.csv',header='true')\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 347
+        },
+        "id": "dr8YlIvBN7Sy",
+        "outputId": "0a9275c4-2284-429f-d783-91f18dbfcbc2"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "AttributeError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-47-ff79fd8e9891>\u001b[0m in \u001b[0;36m<cell line: 6>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0mspark\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mSparkSession\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbuilder\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgetOrCreate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0mdf\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcsv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/personal_transactions.csv'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mheader\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'true'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 6\u001b[0;31m \u001b[0mc\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0morderBy\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"customer_No\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcol\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Transaction Type\"\u001b[0m\u001b[0;34m==\u001b[0m\u001b[0;34m\"debit\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      7\u001b[0m \u001b[0mc\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mshow\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/sql/dataframe.py\u001b[0m in \u001b[0;36m__getattr__\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   2975\u001b[0m         \"\"\"\n\u001b[1;32m   2976\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcolumns\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 2977\u001b[0;31m             raise AttributeError(\n\u001b[0m\u001b[1;32m   2978\u001b[0m                 \u001b[0;34m\"'%s' object has no attribute '%s'\"\u001b[0m \u001b[0;34m%\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__class__\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__name__\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2979\u001b[0m             )\n",
+            "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'col'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "RIL,[1000,1005,1090,1200,1000,900,890]\n",
+        "HDFC,[890,940,810,730,735,960,980]\n",
+        "INFY,[1001,902,1000,990,1230,1100,1200]"
+      ],
+      "metadata": {
+        "id": "IfMJ4SyBcJID"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col,udf\n",
+        "from pyspark.sql.types import StructType, StructField, IntegerType\n",
+        "\n",
+        "# Create a SparkSession\n",
+        "spark = SparkSession.builder.appName(\"Array Column Operations\").getOrCreate()\n",
+        "\n",
+        "def find_max_profit(pridicted):\n",
+        "    max_profit = 0\n",
+        "    buy_price = 0\n",
+        "    sell_price = 0\n",
+        "\n",
+        "    for i in range(len(pridicted)):\n",
+        "        for j in range(i + 1, len(pridicted)):\n",
+        "            profit = pridicted[j] - pridicted[i]\n",
+        "            if profit > max_profit:\n",
+        "                max_profit = profit\n",
+        "                buy_price = pridicted[i]\n",
+        "                sell_price = pridicted[j]\n",
+        "\n",
+        "    return buy_price, sell_price,max_profit\n",
+        "\n",
+        "\n",
+        "# Define the schema for the struct\n",
+        "schema = StructType([\n",
+        "    StructField(\"buy price\", IntegerType(), nullable=False),\n",
+        "    StructField(\"sell price\", IntegerType(), nullable=False),\n",
+        "    StructField(\"max profit\", IntegerType(), nullable=False)\n",
+        "])\n",
+        "\n",
+        "# Apply the UDF to the \"Pridict\" column and create two new columns\n",
+        "df_with_processed_prediction = df.withColumn(\"predictoutputs\", udf(find_max_profit,schema)(col(\"pridicted\")))\n",
+        "\n",
+        "# Extract the struct elements into separate columns\n",
+        "df_with_processed_prediction = df_with_processed_prediction.select(\n",
+        "    col(\"stockid\"),\n",
+        "    col(\"predictoutputs.buy price\").alias(\"buy price\"),\n",
+        "    col(\"predictoutputs.sell price\").alias(\"sell price\"),\n",
+        "    col(\"predictoutputs.max profit\").alias(\"max profit\")\n",
+        ")\n",
+        "\n",
+        "# Sample data\n",
+        "data = [(\"RIL\",[1000,1005,1090,1200,1000,900,890] ), (\"HDFC\",[890,940,810,730,735,960,980]), (\"INFY\", [1001,902,1000,990,1230,1100,1200])]\n",
+        "\n",
+        "# Create a DataFrame\n",
+        "df = spark.createDataFrame(data, [\"stockid\", \"pridicted\"])\n",
+        "\n",
+        "\n",
+        "df_with_processed_prediction.show()\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gkEqml5t3U49",
+        "outputId": "1c7fb138-871a-4155-aceb-44eb54c26d53"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+---------+----------+----------+\n",
+            "|stockid|buy price|sell price|max profit|\n",
+            "+-------+---------+----------+----------+\n",
+            "|    RIL|     1000|      1200|       200|\n",
+            "|   HDFC|      730|       980|       250|\n",
+            "|   INFY|      902|      1230|       328|\n",
+            "+-------+---------+----------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "nput\n",
+        "RollNo, name,tamil,eng,math,sci,social \n",
+        "203040, Rajesh, 10, 20, 30, 40, 50 \n",
+        "\n",
+        "Output:\n",
+        "RollNo,name,Tamil,eng,math,sci,social ,tot\n",
+        "203040, Rajesh, 10, 20, 30, 40, 50,150\n"
+      ],
+      "metadata": {
+        "id": "YBG956D-mN-I"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col,udf\n",
+        "\n",
+        "data=[(203040,\"Rajesh\",10,20,30,40,50)]\n",
+        "coloums=[\"RollNo\",\"name\",\"tamil\",\"eng\",\"math\",\"sci\",\"social\"]\n",
+        "df=spark.createDataFrame(data,coloums)\n",
+        "df.withColumn(\"total marks\",col(\"tamil\")+col(\"eng\")+col(\"math\")+col(\"sci\")+col(\"social\")).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "p-vk8LkabdWq",
+        "outputId": "c4d23ccd-867d-48cb-b045-1986e67109ad"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+------+-----+---+----+---+------+-----------+\n",
+            "|RollNo|  name|tamil|eng|math|sci|social|total marks|\n",
+            "+------+------+-----+---+----+---+------+-----------+\n",
+            "|203040|Rajesh|   10| 20|  30| 40|    50|        150|\n",
+            "+------+------+-----+---+----+---+------+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Replace Checking with Cash"
+      ],
+      "metadata": {
+        "id": "-pi-jLBV9LZT"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.csv('/content/personal_transactions.csv',header='true')\n",
+        "na_replace_df=df.na.replace(\"checking\",\"cash\")\n",
+        "na_replace_df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 383
+        },
+        "id": "3aw_wsevn9Lz",
+        "outputId": "22da26e0-83dc-46ac-f55e-0d1db14f1b4d"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ModuleNotFoundError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-1-ff395010b582>\u001b[0m in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0mpyspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msql\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mSparkSession\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0mspark\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mSparkSession\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbuilder\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgetOrCreate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0mdf\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcsv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/personal_transactions.csv'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mheader\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'true'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0mna_replace_df\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mna\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreplace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"checking\"\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\"cash\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'pyspark'",
+            "",
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0;32m\nNOTE: If your import is failing due to a missing package, you can\nmanually install dependencies using either !pip or !apt.\n\nTo view examples of installing some common dependencies, click the\n\"Open Examples\" button below.\n\u001b[0;31m---------------------------------------------------------------------------\u001b[0m\n"
+          ],
+          "errorDetails": {
+            "actions": [
+              {
+                "action": "open_url",
+                "actionText": "Open Examples",
+                "url": "/notebooks/snippets/importing_libraries.ipynb"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "How to Remove First N lines from Header Using PySpark "
+      ],
+      "metadata": {
+        "id": "pMJgHeOF_ImX"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.csv('/content/duplicate.csv',header=True)\n",
+        "df.createOrReplaceTempView(\"sys\")\n",
+        "res=spark.sql(\"select * from sys where group by Name\")\n",
+        "res.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 514
+        },
+        "id": "1a2d8iAA9VS0",
+        "outputId": "e233ab83-2901-4892-ee6b-2384b7e1f689"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "AnalysisException",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mAnalysisException\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-75-186c4fb2b9e0>\u001b[0m in \u001b[0;36m<cell line: 6>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0mdf\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcsv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/duplicate.csv'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mheader\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcreateOrReplaceTempView\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"sys\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 6\u001b[0;31m \u001b[0mres\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mspark\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msql\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"select * from sys where group by Name\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      7\u001b[0m \u001b[0mres\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mshow\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/sql/session.py\u001b[0m in \u001b[0;36msql\u001b[0;34m(self, sqlQuery, args, **kwargs)\u001b[0m\n\u001b[1;32m   1438\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1439\u001b[0m             \u001b[0mlitArgs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m{\u001b[0m\u001b[0mk\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0m_to_java_column\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlit\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mv\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mk\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mv\u001b[0m \u001b[0;32min\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0margs\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0;34m{\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mitems\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1440\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mDataFrame\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jsparkSession\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msql\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msqlQuery\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlitArgs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1441\u001b[0m         \u001b[0;32mfinally\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1442\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m>\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/py4j/java_gateway.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, *args)\u001b[0m\n\u001b[1;32m   1320\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1321\u001b[0m         \u001b[0manswer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgateway_client\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_command\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcommand\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1322\u001b[0;31m         return_value = get_return_value(\n\u001b[0m\u001b[1;32m   1323\u001b[0m             answer, self.gateway_client, self.target_id, self.name)\n\u001b[1;32m   1324\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/errors/exceptions/captured.py\u001b[0m in \u001b[0;36mdeco\u001b[0;34m(*a, **kw)\u001b[0m\n\u001b[1;32m    173\u001b[0m                 \u001b[0;31m# Hide where the exception came from that shows a non-Pythonic\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    174\u001b[0m                 \u001b[0;31m# JVM exception message.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 175\u001b[0;31m                 \u001b[0;32mraise\u001b[0m \u001b[0mconverted\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    176\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    177\u001b[0m                 \u001b[0;32mraise\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mAnalysisException\u001b[0m: [MISSING_AGGREGATION] The non-aggregating expression \"Age\" is based on columns which are not participating in the GROUP BY clause.\nAdd the columns or the expression to the GROUP BY, aggregate the expression, or use \"any_value(Age)\" if you do not care which of the values within a group is returned.;\nAggregate [Name#1882], [Name#1882, Age#1883, Education#1884, Year#1885]\n+- SubqueryAlias where\n   +- SubqueryAlias sys\n      +- View (`sys`, [Name#1882,Age#1883,Education#1884,Year#1885])\n         +- Relation [Name#1882,Age#1883,Education#1884,Year#1885] csv\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 294
+        },
+        "id": "5KBTwBlK_ehV",
+        "outputId": "6ac54750-4521-450c-df7d-97a892799cd9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "AttributeError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-52-d4393139ad96>\u001b[0m in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcoloum\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mshow\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pyspark/sql/dataframe.py\u001b[0m in \u001b[0;36m__getattr__\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   2975\u001b[0m         \"\"\"\n\u001b[1;32m   2976\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcolumns\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 2977\u001b[0;31m             raise AttributeError(\n\u001b[0m\u001b[1;32m   2978\u001b[0m                 \u001b[0;34m\"'%s' object has no attribute '%s'\"\u001b[0m \u001b[0;34m%\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__class__\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__name__\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2979\u001b[0m             )\n",
+            "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'coloum'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "list1=[\"India\",\"Australia\",\"England\",\"New Zealand\"]\n",
+        "\n",
+        "for i in range(len(list1)-1):\n",
+        "  for j in range(i+1,len(list1)):\n",
+        "    print(str(list1[i])+\" \"+\"Vs\"+\" \"+str(list1[j]))\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BoX3mG04GYKT",
+        "outputId": "2898a4e3-0727-422a-b79d-8386227be4fe"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "India Vs Australia\n",
+            "India Vs England\n",
+            "India Vs New Zealand\n",
+            "Australia Vs England\n",
+            "Australia Vs New Zealand\n",
+            "England Vs New Zealand\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "transactions = [\n",
+        "    {'buyer': 'Alice', 'seller': 'Bob', 'amount': 1000000},\n",
+        "    {'buyer': 'Bob', 'seller': 'Charlie', 'amount': 500000},\n",
+        "    {'buyer': 'Charlie', 'seller': 'Alice', 'amount': 750000},\n",
+        "    {'buyer': 'David', 'seller': 'Alice', 'amount': 100000},\n",
+        "    {'buyer': 'Alice', 'seller': 'Charlie', 'amount': 250000},\n",
+        "    {'buyer': 'Charlie', 'seller': 'David', 'amount': 300000},\n",
+        "    {'buyer': 'David', 'seller': 'Bob', 'amount': 150000},\n",
+        "    {'buyer': 'Bob', 'seller': 'David', 'amount': 200000}\n",
+        "]\n",
+        "a=[]\n",
+        "\n",
+        "sorted_transactions = sorted(transactions, key=lambda x: x['amount'], reverse=True)[-1]\n",
+        "a.append(sorted_transactions['buyer'])\n",
+        "a.append(sorted_transactions['seller'])\n",
+        "\n",
+        "print(a)\n",
+        "\n",
+        "# Print the sorted transactions\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "sOE57EOEQLQC",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d644b60d-727f-44a4-a1ea-3a44f8a338ce"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['David', 'Alice']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Brodcast Variable (spark tuning)"
+      ],
+      "metadata": {
+        "id": "q1YlA4b8d1LA"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import broadcast\n",
+        "\n",
+        "def system1(col):\n",
+        "  return brod.value[col]\n",
+        "\n",
+        "\n",
+        "spark = SparkSession.builder.getOrCreate()\n",
+        "df = spark.read.options(delimiter=\"|\").csv('/content/drive/MyDrive/Datasets/uspopulation.csv',header=True)\n",
+        "df.show(5)\n",
+        "\n",
+        "lookup=dict({\"NY\":\"New york\",\"CA\":\"Califonia\",\"IL\":\"iRELAND\",\"TX\":\"Texus\",\"AZ\":\"Azuland\",\"OH\":\"Ohio\",\"CO\":\"Colocoldio\"})\n",
+        "brod=spark.sparkContext.broadcast(lookup)\n",
+        "df1=df.withColumn(\"State\",udf(system1)(\"state_code\")).show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3YKKc0mKd82H",
+        "outputId": "a6f81a23-0aaa-400a-e4f2-19ae1715f5d5"
+      },
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+-----------+----------+-------------+-----------+------------------+\n",
+            "|2019_rank|       City|State_Code|2019_estimate|2010_Census|            Change|\n",
+            "+---------+-----------+----------+-------------+-----------+------------------+\n",
+            "|        1|New York[d]|        NY|      8336817|    8175133|            0.0198|\n",
+            "|        2|Los Angeles|        CA|      3979576|    3792621|            0.0493|\n",
+            "|        3|    Chicago|        IL|      2693976|    2695598|−0.06%            |\n",
+            "|        4| Houston[3]|        TX|      2320268|    2100263|            0.1048|\n",
+            "|        5|    Phoenix|        AZ|      1680992|    1445632|            0.1628|\n",
+            "+---------+-----------+----------+-------------+-----------+------------------+\n",
+            "only showing top 5 rows\n",
+            "\n",
+            "+---------+----------------+----------+-------------+-----------+------------------+----------+\n",
+            "|2019_rank|            City|State_Code|2019_estimate|2010_Census|            Change|     State|\n",
+            "+---------+----------------+----------+-------------+-----------+------------------+----------+\n",
+            "|        1|     New York[d]|        NY|      8336817|    8175133|            0.0198|  New york|\n",
+            "|        2|     Los Angeles|        CA|      3979576|    3792621|            0.0493| Califonia|\n",
+            "|        3|         Chicago|        IL|      2693976|    2695598|−0.06%            |   iRELAND|\n",
+            "|        4|      Houston[3]|        TX|      2320268|    2100263|            0.1048|     Texus|\n",
+            "|        5|         Phoenix|        AZ|      1680992|    1445632|            0.1628|   Azuland|\n",
+            "|        6|     San Antonio|        TX|      1547253|    1327407|            0.1656|     Texus|\n",
+            "|        7|       San Diego|        CA|      1423851|    1307402|            0.0891| Califonia|\n",
+            "|        8|          Dallas|        TX|      1343573|    1197816|            0.1217|     Texus|\n",
+            "|        9|        San Jose|        CA|      1021795|     945942|            0.0802| Califonia|\n",
+            "|       10|          Austin|        TX|       978908|     790390|            0.2385|     Texus|\n",
+            "|       11|      Fort Worth|        TX|       909585|     741206|            0.2272|     Texus|\n",
+            "|       12|        Columbus|        OH|       898553|     787033|            0.1417|      Ohio|\n",
+            "|       13|San Francisco[g]|        CA|       881549|     805235|            0.0948| Califonia|\n",
+            "|       14|       Denver[i]|        CO|       727211|     600158|            0.2117|Colocoldio|\n",
+            "|       15|         El Paso|        TX|       681728|     649121|            0.0502|     Texus|\n",
+            "|       16|          Tucson|        AZ|       548073|     520116|            0.0538|   Azuland|\n",
+            "|       17|          Fresno|        CA|       531576|     494665|            0.0746| Califonia|\n",
+            "|       18|            Mesa|        AZ|       518012|     439041|            0.1799|   Azuland|\n",
+            "|       19|      Sacramento|        CA|       513624|     466488|             0.101| Califonia|\n",
+            "|       20|Colorado Springs|        CO|       478221|     416427|            0.1484|Colocoldio|\n",
+            "+---------+----------------+----------+-------------+-----------+------------------+----------+\n",
+            "only showing top 20 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "sA_2LfuMeH62"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
